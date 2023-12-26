@@ -25,18 +25,32 @@ class UserController {
     try {
       const data = await ctx.request.body({ type: "json" });
       const requestBody = await data.value;
-      const newUser: User = {
-        fullname: requestBody.fullname,
-        email: requestBody.email,
-        mobile: requestBody.mobile,
-        address: requestBody.address,
-        designation: requestBody.designation,
-      };
-      const store = await createUser(newUser);
+      
+      if(requestBody.password != requestBody.confirm_password) {
+        console.log("password and confirm password does not match")
+        ctx.response.body = { message: "password and confirm password does not match!", User: {} };
+      } else {
+        console.log("password match")
+
+        const newUser: User = {
+          fullname: requestBody.fullname,
+          email: requestBody.email,
+          password: requestBody.password,
+          mobile: requestBody.mobile,
+          address: requestBody.address,
+          date_of_birth: requestBody.date_of_birth,
+          status: 1,
+          can_login: 1,
+          designation: requestBody.designation,
+        };
+        console.log(newUser)
+        const store = await createUser(newUser);
+        console.log(store)
   
-      console.log(`Inserted ${store} rows`);
-  
-      ctx.response.body = { message: "Created User!", User: newUser };
+        console.log(`Inserted ${store} rows`);
+    
+        ctx.response.body = { message: "Created User!", User: newUser };
+      }
     } catch (error) {
       ctx.response.status = 400;
       ctx.response.body = { error: "Invalid request format" };
@@ -54,6 +68,7 @@ class UserController {
         email: requestBody.email,
         mobile: requestBody.mobile,
         address: requestBody.address,
+        date_of_birth: requestBody.date_of_birth,
         designation: requestBody.designation,
       };
       const store = await updateUser(newUser);
