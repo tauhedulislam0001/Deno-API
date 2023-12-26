@@ -1,13 +1,20 @@
 // src/models/User.ts
 import database from "../config/database.ts"
+import { hash } from "https://deno.land/x/bcrypt/mod.ts";
+
 
 class User {
   id!: number;
   fullname!: string;
   email!: string;
+  password!: string;
   mobile!: string;
   address!: string;
   designation!: string;
+  status!:number;
+  can_login!:number;
+  date_of_birth!: string;
+  created_at!: string;
 
   constructor(data: any) {
     Object.assign(this, data);
@@ -22,10 +29,13 @@ export const fetchAll = async (): Promise<number> => {
 };
 
 export const createUser = async (user: User): Promise<User | null> => {
+  const hashedPassword = await hash(user.password);
+  console.log(hashedPassword)
   const result = await database.execute(
-    `INSERT INTO users (fullname, email, mobile, address, designation) VALUES (?, ?, ?, ?, ?)`,
-    [user.fullname, user.email, user.mobile, user.address, user.designation],
+    `INSERT INTO users (fullname, email, mobile, password, address, designation, date_of_birth, status, can_login) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [user.fullname, user.email, user.mobile, hashedPassword, user.address, user.designation, user.date_of_birth, user.status, user.can_login],
   );
+  console.log(result);
 
   if (result.affectedRows > 0) {
     const insertedUserId = result.lastInsertId;
@@ -39,6 +49,7 @@ export const createUser = async (user: User): Promise<User | null> => {
 
   return null;
 };
+
 
 // export const findByID = async (id: any): Promise<number> => {
 //   const result = await database.query("select * from ?? where id = ?", [
@@ -66,8 +77,8 @@ export const updateUser = async (user: User): Promise<string> => {
   ]);
   if (getData != null) {
     const updateData = await database.query(
-      "UPDATE users SET fullname = ?, email = ?, mobile = ?, address = ?, designation = ? WHERE id = ?",
-      [user.fullname, user.email, user.mobile, user.address, user.designation, user.id],
+      "UPDATE users SET fullname = ?, email = ?, mobile = ?, address = ?, date_of_birth=?, designation = ? WHERE id = ?",
+      [user.fullname, user.email, user.mobile, user.address, user.date_of_birth, user.designation, user.id],
     );
     return updateData;
   } else {

@@ -16,8 +16,12 @@ await client.execute(`
         fullname varchar(100) NULL,
         email varchar(100) NULL,
         mobile varchar(100) NULL,
+        password varchar(100) NULL,
+        date_of_birth varchar(100) NULL,
         address text NULL,
         designation text NULL,
+        status int NOT NULL DEFAULT 1,
+        can_login int NOT NULL DEFAULT 1,
         created_at timestamp not null default current_timestamp,
         PRIMARY KEY (id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
