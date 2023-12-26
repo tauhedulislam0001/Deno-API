@@ -40,21 +40,34 @@ export const createUser = async (user: User): Promise<User | null> => {
   return null;
 };
 
-export const findByID = async (id: any): Promise<number> => {
-  const result = await database.query("select * from ?? where id = ?", [
-    "items",
-    id,
-  ]);
-  return result;
+// export const findByID = async (id: any): Promise<number> => {
+//   const result = await database.query("select * from ?? where id = ?", [
+//     "users",
+//     id,
+//   ]);
+//   console.log(result)
+//   return result;
+// };
+
+export const findByID = async (id: any): Promise<any> => {
+  try {
+    console.log('paisi',id);
+    const result = await database.query("SELECT * FROM users WHERE id = ?", [id]);
+    return result;
+  } catch (error) {
+    console.error('error', error);
+    throw error;
+  }
 };
-export const updateUser = async (user: User): Promise<number> => {
+
+export const updateUser = async (user: User): Promise<string> => {
   const getData = await database.query("select * from users where id = ?", [
     user.id,
   ]);
   if (getData != null) {
     const updateData = await database.query(
       "UPDATE users SET fullname = ?, email = ?, mobile = ?, address = ?, designation = ? WHERE id = ?",
-      [user.fullname, user.email, user.mobile, user.address, user.designation],
+      [user.fullname, user.email, user.mobile, user.address, user.designation, user.id],
     );
     return updateData;
   } else {
@@ -62,8 +75,9 @@ export const updateUser = async (user: User): Promise<number> => {
   }
 };
 
-export const deleteByID = async (id: any): Promise<number> => {
+export const deleteByID = async (id: any): Promise<any> => {
     const result = await database.query("DELETE FROM ?? WHERE id = ?", ["users", id]);
+    console.log(result)
     return result.affectedRows || 0;
 };
 

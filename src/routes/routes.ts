@@ -8,6 +8,6 @@ import UserController from "../controllers/UserController.ts";
   router.get("/api/user/:id", UserController.getById);
   router.post("/api/user/create", UserController.create);
   router.put("/api/user/update/:id", UserController.update);
-  router.delete("/api/users/:id", UserController.delete);
+  router.delete("/api/user/delete/:id", UserController.delete);
 
 export default router;

@@ -1,6 +1,6 @@
 // src/controllers/UserController.ts
 import { Context } from "https://deno.land/x/oak/mod.ts";
-import User, {createUser, fetchAll, updateUser, findByID} from "../models/User.ts";
+import User, {createUser, fetchAll, updateUser, findByID, deleteByID} from "../models/User.ts";
 import {database} from '../config/database.ts';
 
 class UserController {
@@ -11,8 +11,7 @@ class UserController {
 
   static async getById(ctx: Context) {
     const userId = ctx.params.id;
-    const user = await findByID({ id: userId });
-    console.log(user)
+    const user = await findByID(userId);
 
     if (user) {
       ctx.response.body = user;
@@ -26,7 +25,6 @@ class UserController {
     try {
       const data = await ctx.request.body({ type: "json" });
       const requestBody = await data.value;
-      console.log(requestBody)
       const newUser: User = {
         fullname: requestBody.fullname,
         email: requestBody.email,
@@ -51,6 +49,7 @@ class UserController {
       const data = await ctx.request.body({ type: "json" });
       const requestBody = await data.value;
       const newUser: User = {
+        id:id,
         fullname: requestBody.fullname,
         email: requestBody.email,
         mobile: requestBody.mobile,
@@ -70,13 +69,13 @@ class UserController {
 
   static async delete(ctx: Context) {
     const userId = ctx.params.id;
-    const user = await User.findOne({ id: userId });
-    if (user) {
-      await user.delete();
-      ctx.response.body = { message: "User deleted successfully" };
+    const user = await deleteByID(userId);
+    console.log(`Deleted ${user} rows`);
+
+    if (user > 0) {
+        ctx.response.body = { message: "Deleted user!" };
     } else {
-      ctx.response.status = 404;
-      ctx.response.body = { message: "User not found" };
+        ctx.response.body = { message: "User not found" };
     }
   }
 }
