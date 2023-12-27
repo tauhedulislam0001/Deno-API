@@ -3,6 +3,9 @@ import { Context } from "https://deno.land/x/oak/mod.ts";
 import User, {createUser, fetchAll, updateUser, findByID, deleteByID} from "../models/User.ts";
 import {database} from '../config/database.ts';
 
+import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
+
+
 class UserController {
   static async getAll(ctx: Context) {
     const users = await fetchAll();
@@ -30,12 +33,15 @@ class UserController {
         console.log("password and confirm password does not match")
         ctx.response.body = { message: "password and confirm password does not match!", User: {} };
       } else {
-        console.log("password match")
+        console.log("password matchsdfa")
 
+        const salt = await bcrypt.genSalt(8);
+        const hashedPassword = await bcrypt.hash(requestBody.password, salt);
+        console.log('check', hashedPassword)
         const newUser: User = {
           fullname: requestBody.fullname,
           email: requestBody.email,
-          password: requestBody.password,
+          password: hashedPassword,
           mobile: requestBody.mobile,
           address: requestBody.address,
           date_of_birth: requestBody.date_of_birth,

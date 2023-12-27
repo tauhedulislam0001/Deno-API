@@ -1,6 +1,5 @@
 // src/models/User.ts
-import database from "../config/database.ts"
-import { hash } from "https://deno.land/x/bcrypt/mod.ts";
+import database from "../config/database.ts";
 
 
 class User {
@@ -11,6 +10,8 @@ class User {
   mobile!: string;
   address!: string;
   designation!: string;
+  access_token!:string;
+  refresh_token!:string;
   status!:number;
   can_login!:number;
   date_of_birth!: string;
@@ -29,13 +30,11 @@ export const fetchAll = async (): Promise<number> => {
 };
 
 export const createUser = async (user: User): Promise<User | null> => {
-  const hashedPassword = await hash(user.password);
-  console.log(hashedPassword)
+  console.log(user);
   const result = await database.execute(
     `INSERT INTO users (fullname, email, mobile, password, address, designation, date_of_birth, status, can_login) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [user.fullname, user.email, user.mobile, hashedPassword, user.address, user.designation, user.date_of_birth, user.status, user.can_login],
+    [user.fullname, user.email, user.mobile, user.password, user.address, user.designation, user.date_of_birth, user.status, user.can_login],
   );
-  console.log(result);
 
   if (result.affectedRows > 0) {
     const insertedUserId = result.lastInsertId;
@@ -62,7 +61,6 @@ export const createUser = async (user: User): Promise<User | null> => {
 
 export const findByID = async (id: any): Promise<any> => {
   try {
-    console.log('paisi',id);
     const result = await database.query("SELECT * FROM users WHERE id = ?", [id]);
     return result;
   } catch (error) {
@@ -70,6 +68,31 @@ export const findByID = async (id: any): Promise<any> => {
     throw error;
   }
 };
+
+
+
+export const findByMobile = async (user: User, mobile: any): Promise<any> => {
+  console.log(mobile)
+  const result = await database.query("SELECT * FROM ?? WHERE mobile = ?", [
+    user,
+    mobile,
+  ]);
+  return result;
+};
+// export const findByEmail = async (email: string, hashedPassword: string): Promise<User | null> => {
+//   try {
+//     const result = await database.query("SELECT * FROM users WHERE email = ? AND password = ?", [email, hashedPassword]);
+    
+//     if (result.length > 0) {
+//       return result[0] as User;
+//     } else {
+//       return null;
+//     }
+//   } catch (error) {
+//     console.error('Error in findByEmailAndPassword:', error);
+//     throw error;
+//   }
+// };
 
 export const updateUser = async (user: User): Promise<string> => {
   const getData = await database.query("select * from users where id = ?", [
